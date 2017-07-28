@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ehcache>
+<!-- 
+maxElementsInMemory:缓存中最大允许创建的对象数
+eternal:缓存中对象是否为永久的，如果是，超时设置将被忽略，对象从不过期
+timeToIdleSeconds:缓存数据钝化时间(设置对象在它过期之前的空闲时间)
+timeToLiveSeconds:缓存数据的生存时间(设置对象在它过期之前的生存时间)
+overflowToDisk:内存不足时，是否启用磁盘缓存
+clearOnFlush:内存数量最大时是否清除
+-->
+<defaultCache 
+	maxElementsInMemory="1000"
+	eternal="false"
+    timeToIdleSeconds="1200"
+    timeToLiveSeconds="1200"
+    overflowToDisk="false"
+    clearOnFlush="true">
+</defaultCache>
+<!-- 单独对某个entity的缓存策略设置-->
+<!-- <cache name="com.mushi.core.entity.user.User" 
+	maxElementsInMemory="100"
+     eternal="false"
+     timeToIdleSeconds="1200" 
+     timeToLiveSeconds="1200" 
+     overflowToDisk="false"
+     clearOnFlush="true">
+</cache> -->
+</ehcache>
