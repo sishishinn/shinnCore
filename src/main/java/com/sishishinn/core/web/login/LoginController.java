@@ -37,7 +37,8 @@ public class LoginController {
             return "redirect:login.jsp";  
         } catch (Exception others) {  
             System.out.println("其他异常: " + others);  
-            request.getSession().setAttribute("username", "username");
+            others.printStackTrace();
+            request.getSession().setAttribute("username", username);
             request.getSession().setAttribute("message", "登陆异常");
             return "redirect:login.jsp";  
         }

@@ -16,12 +16,10 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 
 import com.sishishinn.core.entity.user.User;
 import com.sishishinn.core.service.user.UserManager;
 import com.sishishinn.core.util.EmptyUtil;
-
 
 public class ShiroDbRealm extends AuthorizingRealm implements Serializable {
 
@@ -38,7 +36,9 @@ public class ShiroDbRealm extends AuthorizingRealm implements Serializable {
 		UsernamePasswordToken logintoken = (UsernamePasswordToken) token;
 		String username = logintoken.getUsername();
 		String password = new String(logintoken.getPassword());
+		
 		User user = userManager.fingUserByLoginName(username);
+		
 		if (EmptyUtil.isEmpty(user)) {
 			throw new UnknownAccountException("没有这个账号");
 		}else{
