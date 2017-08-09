@@ -65,7 +65,7 @@
 <script type="text/javascript">
 $(document).ready(function () {
 	$("#jqGrid").jqGrid({
-		url: '${ctx}/user/loadData',
+		url: '${ctx}/core/user/loadData',
 		colNames:[ '账号','角色', '创建时间','操作'],//指定了jqGrid每列的title，按顺序依次排列，并且可以看出实际上它就是一个字符串数组。
 		colModel: [
 	      			{ name: 'name',index: 'name', width: 90 ,formatter :function(cellvalue, options, rowObject) {return "<a href='javascript:jqGridedit(\""+rowObject.id+"\")' >"+cellvalue+"</a>";}},
@@ -80,6 +80,7 @@ $(document).ready(function () {
 	      			}                   
 		],//指定了jqGrid各列的具体格式，"name"指定对应数据中属性名，“index”用于列排序，“width”显然是指定列宽，“align”对齐方式 eg:align:"right",，“sortable”指定是否支持排序。
 		datatype: "json",//指定了jqGrid调用的数据的格式，常用格式有json，xml，local。
+		mtype:"post",//定义请求方式
 		jsonReader:{
 	        id: "id",//相当于设置主键
 	        root : "rows", //Json数据
@@ -139,7 +140,7 @@ $(document).ready(function () {
 });
 
 function add(){
-	window.location.href = "${ctx}/user/form";
+	window.location.href = "${ctx}/core/user/form";
 }
 
 function edit(){
@@ -147,12 +148,12 @@ function edit(){
 	if (!id) {
 		alert("请选择一条记录");
 	}else{
-		window.location.href = "${ctx}/user/form?id="+id;
+		window.location.href = "${ctx}/core/user/form?id="+id;
 	}
 }
 
 function jqGridedit(id){
-	window.location.href = "${ctx}/user/form?id="+id;
+	window.location.href = "${ctx}/core/user/form?id="+id;
 }
 
 function del(){
@@ -161,7 +162,7 @@ function del(){
 		alert("请至少选择一条记录");
 	}else{
 		$.ajax({
-			url:'${ctx}/user/delete',
+			url:'${ctx}/core/user/delete',
 			type:'post',
 			data:'ids='+arrrow.join(","),
 			success:function(data){
@@ -178,7 +179,7 @@ function del(){
 
 function jqGriddel(id){
 	$.ajax({
-		url:'${ctx}/user/delete',
+		url:'${ctx}/core/user/delete',
 		type:'post',
 		data:'ids='+id,
 		success:function(data){
