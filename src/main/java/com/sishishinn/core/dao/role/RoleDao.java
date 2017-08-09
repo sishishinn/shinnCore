@@ -25,6 +25,6 @@ public interface RoleDao extends PagingAndSortingRepository<Role, String>, JpaSp
 	@QueryHints({@QueryHint(name = "org.hibernate.cacheable", value ="true") })
 	List<Role> getAll();
 
-	@QueryHints({@QueryHint(name = "org.hibernate.cacheable", value ="true") })
+	//@QueryHints({@QueryHint(name = "org.hibernate.cacheable", value ="true") })
 	Page<Role> findAll(Specification<Role> spec, Pageable pageable);
 }

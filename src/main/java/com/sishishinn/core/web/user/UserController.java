@@ -108,8 +108,6 @@ public class UserController extends CrudControllerSupport{
 			writeJson(response, jsonResult.failureASJson(msg));
 			
         }
-		
-		
 	}
 	
 	@RequestMapping(value = "delete", method = RequestMethod.POST)
