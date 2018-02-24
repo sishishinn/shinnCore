@@ -1,5 +1,8 @@
 package com.sishishinn.core.web.login;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
@@ -9,6 +12,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class LoginController {
@@ -24,6 +28,7 @@ public class LoginController {
 
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken token = new UsernamePasswordToken(username,password);
+//		token.setRememberMe(true); 
 		try {
             subject.login(token);
 		} catch (UnknownAccountException unknownaccount) {  
@@ -45,5 +50,25 @@ public class LoginController {
         return "success";
 		
     }
+	
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public void test() throws Exception{
+		List<String> list = new ArrayList<>();
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < threads.length; i ++){
+            threads[i] = new Thread(() -> {
+                for (int j = 0;j < 100; j ++){
+                    list.add(Thread.currentThread().getName() + ":" + j);
+                }
+            });
+            threads[i].start();
+        }
+
+        for (Thread thread : threads){
+            thread.join();
+        }
+
+        System.out.println(list.size());
+	}
 	
 }

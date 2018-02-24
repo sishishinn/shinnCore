@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ include file="/common/taglibs/taglibs.jsp" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <head>
     <meta charset="utf-8">
@@ -15,7 +15,9 @@
 	<script src="${ctx}/static/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<link href="${ctx}/static/bootstrap/3.3.7/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-    
+    <script src="${ctx}/static/laydate/laydate.js"></script>
+    <link rel="stylesheet" href="${ctx}/static/layui/css/layui.css" media="all">
+    <script src="${ctx}/static/layui/layui.js"></script>
 </head>
 
 <body>
@@ -51,6 +53,18 @@
 						                    </div>
 						                </div>
 						                <div class="form-group">
+						                    <label class="col-sm-2 control-label">Age</label>
+						                    <div class="col-sm-10">
+						                        <input type="text" class="form-control" id="age" name="age" value="${user.age }" placeholder="age">
+						                    </div>
+						                </div>
+						                <div class="form-group">
+						                    <label class="col-sm-2 control-label">Date</label>
+						                    <div class="col-sm-10">
+						                        <input type="text" class="form-control" id="birthday" name="birthday" value="<fmt:formatDate value='${user.birthday}' pattern='yyyy-MM-dd HH:mm'/>" placeholder="birthday">
+						                    </div>
+						                </div>
+						                <div class="form-group">
                                             <label class="col-sm-2 control-label">Role</label>
                                             <div class="col-sm-10">
                                                 <select class="form-control selectpicker" name="roleId" id="roleId">
@@ -61,6 +75,15 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        
+                                        <div class="form-group">
+                                        	<div class="layui-upload-list" id="imglist">
+                                        	</div>
+	                                        <button type="button" class="layui-btn" id="test1">
+											  <i class="layui-icon">&#xe67c;</i>上传图片
+											</button>
+										</div>
+                                        
 						                <button type="button" class="btn btn-default back">Back</button>
                                         <button type="button" class="btn btn-default save">Submit</button>
 						            </form>
@@ -71,16 +94,54 @@
                 </div>
             </section>
 
+		
+
+
         </section>
     </div>
 <script type="text/javascript">
+//图片上传
+layui.use('upload', function(){
+  var upload = layui.upload;
+  //执行实例
+  var uploadInst = upload.render({
+    elem: '#test1' //绑定元素
+    ,url: '${ctx}/core/upload/uploadImgs' //上传接口
+    ,multiple:true
+   	,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+		layer.load(); //上传loading
+	}
+    ,done: function(res){
+	   	//请求成功回调
+    	if("ok"==res.state){
+    		var filenameList = res.data.filenameList;
+    		for(var i =0;i<filenameList.length;i++){
+		    	$("#imglist").append('<img class="layui-upload-img" width="100px" id="" src="${ctx}/core/upload/showImg?filename='+res.data.filenameList[i]+'">');
+		    	$("#imglist").append('<input type="hidden" name="img" value="'+res.data.filenameList[i]+'">');
+    		}
+    	}
+    	layer.closeAll('loading'); //关闭loading
+    }
+    ,error: function(){
+		//请求异常回调
+		layer.closeAll('loading'); //关闭loading
+    }
+  });
+});
+//日期插件
+laydate.render({
+  elem: '#birthday',		//指定元素
+  type: 'datetime',			//默认date
+  format: 'yyyy-MM-dd HH:mm',
+});
+
 $(".back").click(function(){
 	window.location.href = "${ctx}/core/user?backFlag=1";
 });
 $(".save").click(function(){
 	var formData = $("#formId").serialize();
 	$.ajax({
-		url:'${ctx}/core/user/add',
+		url:'${ctx}/core/user/user',
 		type:'post',
 		data:formData,
 		dataType:'json',

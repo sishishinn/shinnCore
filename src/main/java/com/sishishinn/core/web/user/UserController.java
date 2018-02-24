@@ -1,5 +1,7 @@
 package com.sishishinn.core.web.user;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +15,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sishishinn.core.dto.user.UserView;
 import com.sishishinn.core.entity.role.Role;
@@ -71,17 +75,16 @@ public class UserController extends CrudControllerSupport{
 		writeJson(response, json.successASJson("ok"));
 	}
 	
-	@RequestMapping(value = "form", method = RequestMethod.GET)
+	@RequestMapping(value = "user", method = RequestMethod.GET)
 	public String input(HttpServletRequest request) throws Exception{
 		List<Role> roleList = roleManager.getAll();
 		request.setAttribute("roleList", roleList);
 		return "core/user/userForm";
 	}
 	
-	@RequestMapping(value = "add", method = RequestMethod.POST)
+	@RequestMapping(value = "user", method = RequestMethod.POST)
 	public void add(User user,HttpServletRequest request,HttpServletResponse response) throws Exception{
 		JsonResult jsonResult = new JsonResult();
-		
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();  
    	 	Validator validator = factory.getValidator();  
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
@@ -92,6 +95,9 @@ public class UserController extends CrudControllerSupport{
         		Role role = roleManager.get(roleId);
         		user.setRole(role);
         		user.setRolename(role.getName());
+        	}else{
+        		user.setRole(null);
+        		user.setRolename(null);
         	}
         	
         	userManager.save(user);
@@ -110,7 +116,7 @@ public class UserController extends CrudControllerSupport{
         }
 	}
 	
-	@RequestMapping(value = "delete", method = RequestMethod.POST)
+	@RequestMapping(value = "user", method = RequestMethod.DELETE)
 	public void delete(HttpServletRequest request,HttpServletResponse response) throws Exception{
 		String ids = request.getParameter("ids");
 		try {
@@ -126,6 +132,9 @@ public class UserController extends CrudControllerSupport{
 		}
 	}
 	
+	/**
+	 * 每个方法执行前被执行
+	 */
 	@ModelAttribute
 	public void prepareModel(@RequestParam(value = "id",required=false) String id, Map<String, Object> map) throws Exception{
 		if (!EmptyUtil.isEmpty(id)) {

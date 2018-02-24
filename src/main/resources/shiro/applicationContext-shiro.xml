@@ -8,6 +8,7 @@
 	<!-- Shiro's main business-tier object for web-enabled applications -->
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
 		<property name="realm" ref="shiroDbRealm" />
+<!-- 		<property name="rememberMeManager" ref="rememberMeManager"/> -->
 		<property name="cacheManager" ref="shiroEhcacheManager" />
 	</bean>
 
@@ -19,22 +20,41 @@
         <property name="redirectUrl" value="/loginform" />
     </bean>
 	
+	<!-- 自定义过滤器 -->
+	<bean id="myAccessFilter" class="com.sishishinn.core.framework.security.MyAccessFilter" />
+	
 	<!-- Shiro Filter -->
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="/login.jsp" />
 		<property name="successUrl" value="/" />
+		<property name="filters">
+            <map>
+                <entry key="myAccessFilter" value-ref="myAccessFilter" />
+            </map>
+        </property>
 		<property name="filterChainDefinitions">
 			<value>
+				/static/** = anon
+				/open/**=anon
 				/login.jsp=anon
 				/logout = logout
-				/static/** = anon
-				/login = anon
-				/open/**=anon
+				/login = myAccessFilter
 				/** = user
 			</value>
 		</property>
 	</bean>
+	
+	<!-- 记住我Cookie 和 管理器 -->
+	<bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">  
+	    <constructor-arg value="rememberMe"/>  
+	    <property name="httpOnly" value="true"/>  
+	    <property name="maxAge" value="3000000"/><!-- 单位秒 -->
+	</bean>
+	<bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">  
+	    <property name="cipherKey" value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}"/>  
+	     <property name="cookie" ref="rememberMeCookie"/>  
+	</bean>   
 	
 	<!-- 用户授权信息Cache, 采用EhCache -->
 	<bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">

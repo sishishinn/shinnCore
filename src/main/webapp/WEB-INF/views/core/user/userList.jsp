@@ -140,7 +140,7 @@ $(document).ready(function () {
 });
 
 function add(){
-	window.location.href = "${ctx}/core/user/form";
+	window.location.href = "${ctx}/core/user/user";
 }
 
 function edit(){
@@ -148,12 +148,12 @@ function edit(){
 	if (!id) {
 		alert("请选择一条记录");
 	}else{
-		window.location.href = "${ctx}/core/user/form?id="+id;
+		window.location.href = "${ctx}/core/user/user?id="+id;
 	}
 }
 
 function jqGridedit(id){
-	window.location.href = "${ctx}/core/user/form?id="+id;
+	window.location.href = "${ctx}/core/user/user?id="+id;
 }
 
 function del(){
@@ -162,9 +162,9 @@ function del(){
 		alert("请至少选择一条记录");
 	}else{
 		$.ajax({
-			url:'${ctx}/core/user/delete',
-			type:'post',
-			data:'ids='+arrrow.join(","),
+			url:'${ctx}/core/user/user',
+			type:'POST',
+			data:{"ids":arrrow.join(","),"_method" : "DELETE"},
 			success:function(data){
 				if ("ok" == data.state) {
 					alert("删除成功");
@@ -179,9 +179,9 @@ function del(){
 
 function jqGriddel(id){
 	$.ajax({
-		url:'${ctx}/core/user/delete',
-		type:'post',
-		data:'ids='+id,
+		url:'${ctx}/core/user/user',
+		type:'POST',
+		data:{"ids":id,"_method" : "DELETE"},
 		success:function(data){
 			if ("ok" == data.state) {
 				alert("删除成功");

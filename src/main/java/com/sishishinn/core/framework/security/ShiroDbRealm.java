@@ -37,7 +37,7 @@ public class ShiroDbRealm extends AuthorizingRealm implements Serializable {
 		String username = logintoken.getUsername();
 		String password = new String(logintoken.getPassword());
 		
-		User user = userManager.fingUserByLoginName(username);
+		User user = userManager.findByName(username);
 		
 		if (EmptyUtil.isEmpty(user)) {
 			throw new UnknownAccountException("没有这个账号");
@@ -64,6 +64,7 @@ public class ShiroDbRealm extends AuthorizingRealm implements Serializable {
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		System.out.println("授权");
 		ShiroUser shiroUser = (ShiroUser) principals.getPrimaryPrincipal();
 		return new SimpleAuthorizationInfo(shiroUser.getRoles());
 	}

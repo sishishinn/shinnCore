@@ -5,6 +5,11 @@
 <head>
 <!-- Custom styles for this template -->
 <link href="${ctx}/static/bootstrap/3.3.7/other/signin.css" rel="stylesheet">
+<style type="text/css">
+input[type="password"]{
+	background-image:url("http:localhost:8080/a");
+}
+</style>
 </head>
 <body>
 	<div class="container">

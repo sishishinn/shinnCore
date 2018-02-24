@@ -17,7 +17,7 @@ import com.sishishinn.core.service.ServiceManager;
 import com.sishishinn.core.util.EmptyUtil;
 
 
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 @Service
 public class RoleManager extends ServiceManager<Role>{
 	
@@ -39,12 +39,12 @@ public class RoleManager extends ServiceManager<Role>{
 
 	@Override
 	public Role get(String id) throws Exception {
-		return roledao.get(id);
+		return roledao.findOne(id);
 	}
 
 	@Override
 	public List<Role> getAll() throws Exception {
-		return roledao.getAll();
+		return roledao.findAll();
 	}
 	
 	@Override

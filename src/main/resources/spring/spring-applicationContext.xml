@@ -23,8 +23,7 @@
 	<!-- 使用配置文件加载数据库配置 -->
 	<context:property-placeholder ignore-unresolvable="true" location="classpath*:/application.properties" />
 	<!-- 数据源配置, 使用Tomcat JDBC连接池 -->
-	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
-		destroy-method="close">
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
 		<!-- Connection Info -->
 		<property name="driverClassName" value="${jdbc.driver}" />
 		<property name="url" value="${jdbc.url}" />
@@ -32,16 +31,40 @@
 		<property name="password" value="${jdbc.password}" />
 
 		<!-- Connection Pooling Info -->
-		<property name="maxActive" value="${jdbc.pool.maxActive}" />
-		<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
-		<property name="minIdle" value="0" />
+		<!-- （整型值）连接器启动时创建的初始连接数。默认为 10。 -->
+		<property name="initialSize" value="10" />
+		<!-- （整形值）池同时能分配的活跃连接的最大数目。默认为 100。 -->
+		<property name="maxActive" value="100" />
+		<!-- （整型值）池始终都应保留的连接的最大数目。默认为 maxActive:100。会周期性检查空闲连接（如果启用该功能），留滞时间超过 minEvictableIdleTimeMillis 的空闲连接将会被释放。（请参考 testWhileIdle） -->
+		<property name="maxIdle" value="100" />
+		<!-- （整型值）池始终都应保留的连接的最小数目。如果验证查询失败，则连接池会缩减该值。默认值取自 initialSize:10（请参考 testWhileIdle）。 -->
+		<property name="minIdle" value="10" />
+		<!-- （整型值）在抛出异常之前，连接池等待（没有可用连接时）返回连接的最长时间，以毫秒计。默认为 30000（30 秒） -->
+		<property name="maxWait" value="10000" />
+		<!-- （布尔值）连接池所创建的连接默认自动提交状态。如果未设置，则默认采用 JDBC 驱动的缺省值（如果未设置，则不会调用 setAutoCommit 方法）。 -->
 		<property name="defaultAutoCommit" value="false" />
+		<!-- （字符串）在将池中连接返回给调用者之前，用于验证这些连接的 SQL 查询。如果指定该值，则该查询不必返回任何数据，只是不抛出 SQLException 异常。默认为 null。实例值为：SELECT 1（MySQL） select 1 from dual（Oracle） SELECT 1（MySQL Server）。 -->
+		<property name="validationQuery" value="SELECT 1" />  
+		<!-- 长整型值。为避免过度验证而设定的频率时间值（以秒计）。最多以这种频率运行验证。如果连接应该进行验证，但却没能在此间隔时间内得到验证，则会重新对其进行验证。默认为 30000（30 秒）。 -->
+		<property name="validationInterval" value="30000" />
+		<!-- （整型值）空闲连接验证/清除线程运行之间的休眠时间（以毫秒计）。不能低于 1 秒。该值决定了我们检查空闲连接、废弃连接的频率，以及验证空闲连接的频率。默认为 5000（5 秒） -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<!-- （整型值）在被确定应被清除之前，对象在池中保持空闲状态的最短时间（以毫秒计）。默认为 60000（60 秒） -->
+		<property name="minEvictableIdleTimeMillis" value="60000" />
+		
+		<!-- 测试用 用于检查链接泄漏  正式使用时去除 -->
+		<!-- （布尔值）该值为标志（Flag）值，表示如果连接时间超出了 removeAbandonedTimeout，则将清除废弃连接。如果该值被设置为 true，则如果连接时间大于 removeAbandonedTimeout，该连接会被认为是废弃连接，应予以清除。若应用关闭连接失败时，将该值设为 true 能够恢复该应用的数据库连接。另请参阅 logAbandoned。默认值为 false。 -->
+		<property name="removeAbandoned" value="true" />
+		<!-- （布尔值）标志能够针对丢弃连接的应用代码，进行堆栈跟踪记录。由于生成堆栈跟踪，对废弃连接的日志记录会增加每一个借取连接的开销。默认为 false -->
+		<property name="logAbandoned" value="true" />
+		<!-- （整型值）在废弃连接（仍在使用）可以被清除之前的超时秒数。默认为 60（60 秒）。应把该值设定为应用可能具有的运行时间最长的查询。 -->
+		<property name="removeAbandonedTimeout" value="60" />
 	</bean>
 
 	<!-- Jpa Entity Manager 配置 -->
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<!-- 设置hibernate方言 可以使用java类动态生成 -->
+		<!-- 指定使用的是哪一个厂商的JPA实现 如Hibernate -->
 		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
 		<property name="packagesToScan" value="com.sishishinn" />
 		<property name="jpaProperties">
@@ -77,6 +100,17 @@
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory"/>
 	</bean>
+
+	<!-- 配置transactionTemplate 用于编程式事务 -->  
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">  
+	    <property name="transactionManager" ref="transactionManager"></property>  
+	    <!--定义事务隔离级别,-1表示使用数据库默认级别-->  
+	    <property name="readOnly" value="false"></property>
+	    <!-- 这是一个PlatfromTransactionManager默认的隔离级别，使用数据库默认的事务隔离级别 -->
+	    <property name="isolationLevelName" value="ISOLATION_DEFAULT"></property>  
+	    <!-- 如果当前没有事务，就新建一个事务，如果已经存在一个事务中，加入到这个事务中。这是最常见的选择。 -->
+	    <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"></property>  
+	</bean>  
 
 	<!-- 使用annotation定义事务 -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />

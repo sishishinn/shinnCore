@@ -17,7 +17,7 @@ import com.sishishinn.core.service.ServiceManager;
 import com.sishishinn.core.util.EmptyUtil;
 
 
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 @Service
 public class UserManager extends ServiceManager<User>{
 	
@@ -29,7 +29,7 @@ public class UserManager extends ServiceManager<User>{
 		if (EmptyUtil.isEmpty(user.getId())) {
 			user.setCreatetime(new Date());
 		}
-		userdao.save(user);  
+		userdao.save(user);
     }  
 	
 	@Override
@@ -39,12 +39,12 @@ public class UserManager extends ServiceManager<User>{
 
 	@Override
 	public User get(String id) throws Exception {
-		return userdao.get(id);
+		return userdao.findOne(id);
 	}
 
 	@Override
 	public List<User> getAll() throws Exception {
-		return userdao.getAll();
+		return userdao.findAll();
 	}
 	
 	@Override
@@ -54,8 +54,12 @@ public class UserManager extends ServiceManager<User>{
 		return userdao.findAll(spec, pageRequest);
 	}
 	
-	public User fingUserByLoginName(String loginname) {
-		return userdao.fingUserByLoginName(loginname);
+	public User findByName(String loginname) {
+		return userdao.findByName(loginname);
+	}
+
+	public List<User> findByRoleId(String roleid) {
+		return userdao.findByRole_Id(roleid);
 	}
     
 }

@@ -20,7 +20,9 @@ public class UserView {
 		this.id = user.getId();
 		this.name = user.getName();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		this.createtime = sdf.format(user.getCreatetime());
+		if (!EmptyUtil.isEmpty(user.getCreatetime())) {
+			this.createtime = sdf.format(user.getCreatetime());
+		}
 		if (!EmptyUtil.isEmpty(user.getRole())) {
 			this.rolename = user.getRole().getName();
 		}

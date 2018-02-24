@@ -1,5 +1,7 @@
 package com.sishishinn.core.entity.user;
 
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +15,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.sishishinn.core.entity.ObjectEntity;
 import com.sishishinn.core.entity.role.Role;
@@ -27,6 +30,10 @@ public class User extends ObjectEntity {
 	
 	private String name;
 	private String password;
+	
+	private int age = 0;
+	private Date birthday;
+	
 	private Role role;
 	private String rolename;
 
@@ -65,6 +72,23 @@ public class User extends ObjectEntity {
 
 	public void setRolename(String rolename) {
 		this.rolename = rolename;
+	}
+	
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")  
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
 	@Override
