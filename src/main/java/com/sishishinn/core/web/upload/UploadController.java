@@ -1,5 +1,6 @@
 package com.sishishinn.core.web.upload;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,8 +27,8 @@ import com.sishishinn.core.web.CrudControllerSupport;
 @RequestMapping(value = "/core/upload")
 public class UploadController extends CrudControllerSupport{
 	
-	@RequestMapping(value = "uploadImg",method = RequestMethod.POST)
-	public void uploadImg(MultipartFile file,HttpServletResponse response)throws Exception{
+	@RequestMapping(value = "uploadFile",method = RequestMethod.POST)
+	public void uploadFile(MultipartFile file,HttpServletResponse response)throws Exception{
 		JsonResult jsonResult = new JsonResult();
 		 if(!file.isEmpty()){  
         	String filename = System.currentTimeMillis()+ file.getOriginalFilename();
@@ -40,30 +41,42 @@ public class UploadController extends CrudControllerSupport{
 	@RequestMapping(value = "showImg",method = RequestMethod.GET)  
     public void showImg(HttpServletRequest request,HttpServletResponse response) {  
 		String filename = request.getParameter("filename");
-        FileInputStream fis = null;  
-        OutputStream os = null;  
+        FileInputStream fileInputStream = null;  
+        BufferedInputStream bufferedInputStream =null;
+        OutputStream outputStream = null;
         try {  
-            fis = new FileInputStream("s:/temp/file/"+filename);  
-            os = response.getOutputStream();  
+            fileInputStream = new FileInputStream("s:/temp/file/"+filename);
+            bufferedInputStream = new BufferedInputStream(fileInputStream);
+            outputStream = response.getOutputStream();  
             int count = 0;  
             byte[] buffer = new byte[1024 * 8];  
-            while ((count = fis.read(buffer)) != -1) {  
-                os.write(buffer, 0, count);  
-                os.flush();  
+            while ((count = bufferedInputStream.read(buffer)) != -1) {  
+                outputStream.write(buffer, 0, count);  
+                outputStream.flush();  
             }  
         } catch (Exception e) {  
             e.printStackTrace();  
-        }  
-        try {  
-            fis.close();  
-            os.close();  
-        } catch (IOException e) {  
-            e.printStackTrace();  
-        }  
+        }finally{
+        	try {
+                bufferedInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        	try {
+        		fileInputStream.close();  
+        	} catch (IOException e) {  
+        		e.printStackTrace();  
+        	}
+        	try {
+                outputStream.close();  
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }  
 	
-	@RequestMapping(value = "uploadImgs",method = RequestMethod.POST)
-	public void uploadImgs(HttpServletRequest request, HttpServletResponse response)throws Exception{
+	@RequestMapping(value = "uploadFiles",method = RequestMethod.POST)
+	public void uploadFiles(HttpServletRequest request, HttpServletResponse response)throws Exception{
 		try {
 			JsonResult jsonResult = new JsonResult();
 			List<String> filenameList = new ArrayList<String>();
@@ -88,9 +101,55 @@ public class UploadController extends CrudControllerSupport{
 			jsonResult.putData("filenameList", filenameList);
 			writeJson(response, jsonResult.successASJson(""));
 		} catch (Exception e) {
+			e.printStackTrace(); 
 			writeJson(response, JsonResult.failureToJson(""));
 		}
 	}
-		
+	
+	@RequestMapping(value = "downloadFile")
+	public void downloadFile(HttpServletRequest request, HttpServletResponse response)throws Exception{
+		String filename = request.getParameter("filename");
+		System.out.println(filename);
+		File file = new File("S:\\temp\\file\\",filename);
+        if(file.exists()){
+            response.setContentType("application/octet-stream");
+            response.addHeader("Content-Disposition","attachment;filename="+ new String(filename.getBytes("utf-8"), "ISO8859-1" ) );
+            byte[] buffer = new byte[1024];
+            FileInputStream fileInputStream =null;
+            BufferedInputStream bufferedInputStream =null;
+            OutputStream outputStream =response.getOutputStream();
+            try {
+                fileInputStream = new FileInputStream(file);
+                bufferedInputStream = new BufferedInputStream(fileInputStream);
+                int count = 0;
+                while ((count = bufferedInputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, count);
+                    outputStream.flush();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                try {
+                    bufferedInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                	outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("文件下载成功");
+        }else{
+        	System.out.println("文件不存在");
+        }
+	}
+	
 	
 }

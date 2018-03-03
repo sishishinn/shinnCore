@@ -82,6 +82,9 @@
 	                                        <button type="button" class="layui-btn" id="test1">
 											  <i class="layui-icon">&#xe67c;</i>上传图片
 											</button>
+											<button type="button" class="layui-btn"  onclick="download()">
+											  <i class="layui-icon">&#xe67c;</i>下载文件
+											</button>
 										</div>
                                         
 						                <button type="button" class="btn btn-default back">Back</button>
@@ -100,14 +103,18 @@
         </section>
     </div>
 <script type="text/javascript">
+function download(){
+	window.open("${ctx}/core/upload/downloadFile?filename=1520061970584复习.docx"); 
+}
 //图片上传
 layui.use('upload', function(){
   var upload = layui.upload;
   //执行实例
   var uploadInst = upload.render({
     elem: '#test1' //绑定元素
-    ,url: '${ctx}/core/upload/uploadImgs' //上传接口
+    ,url: '${ctx}/core/upload/uploadFiles' //上传接口
     ,multiple:true
+    ,accept:'file'
    	,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
 		layer.load(); //上传loading
 	}
